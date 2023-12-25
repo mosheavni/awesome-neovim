@@ -1,6 +1,11 @@
 name: PR Title
 
-on: [pull_request]
+on:
+  pull_request:
+    types:
+      - edited
+      - opened
+      - reopened
 
 jobs:
   run:
