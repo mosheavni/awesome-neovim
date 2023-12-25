@@ -2,10 +2,7 @@ name: PR Title
 
 on:
   pull_request:
-    types:
-      - edited
-      - opened
-      - reopened
+    types: [opened, synchronize]
 
 jobs:
   run:
