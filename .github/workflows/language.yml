@@ -12,6 +12,8 @@ jobs:
         with:
           fetch-depth: 0 # needed to checkout all branches for this Action to work
 
+      - uses: dcarbone/install-jq-action@v2
+
       # Check the PR diff using the current branch and the base branch of the PR
       - uses: GrantBirki/git-diff-action@v2.4.0
         id: git-diff-action
@@ -20,17 +22,20 @@ jobs:
           raw_diff_file_output: diff.txt
           file_output_only: "true"
 
-      # Print the diff in JSON format
-      - name: print json diff
+      - name: Changed lines on README.md
+        id: changed-lines
         env:
           DIFF: ${{ steps.git-diff-action.outputs.json-diff-path }}
-        run: cat $DIFF
+        run: |
+          CHANGED_LINES=$(jq -r '.files[] | select(.path == "README.md" and .type == "ChangedFile").chunks[].changes[] | select(.type != "UnchangedLine").content' $DIFF)
+          echo "changed-lines=$CHANGED_LINES" >> "$GITHUB_OUTPUT"
 
-      # Print the diff in raw git format
-      - name: print raw diff
+      - name: Get repo URL
+        id: repo-url
+        run: grep -Po 'https?:\/\/[^\s)]+' <<<"$LINES_DIFF"
         env:
-          DIFF: ${{ steps.git-diff-action.outputs.raw-diff-path }}
-        run: cat $DIFF
+          LINES_DIFF: ${{ steps.changed-lines.outputs.changed-lines }}
+
       - name: Extracting Repo Languages
         id: langsDetector
         run: |
