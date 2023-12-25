@@ -42,7 +42,7 @@ jobs:
         env:
           REPO_URL: ${{ steps.repo-url.outputs.repo-url }}
         run: |
-          SHORT_REPO=$(sed -En 's,.*\(https:\/\/github.com\/(\w+\/\w+).*,\1,p' <<<"$REPO_URL")
+          SHORT_REPO=$(grep -Po '\w+\/\w+$' <<<"$REPO_URL")
           echo "SHORT_REPO=$SHORT_REPO"
           REPO_LANGUAGES=`curl -sL \
           -H "Accept: application/vnd.github+json" \
